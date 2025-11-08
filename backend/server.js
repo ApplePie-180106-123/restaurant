@@ -3,8 +3,8 @@ import dotenv from "dotenv";
 import cors from "cors";
 import connectDB from "./config/db.js";
 import userRoutes from "./routes/userRoutes.js";
-// import menuRoutes from "./routes/menuRoutes.js";
-// import orderRoutes from "./routes/orderRoutes.js";
+import menuRoutes from "./routes/menuRoutes.js";
+import orderRoutes from "./routes/orderRoutes.js";
 import { notFound, errorHandler } from "./middleware/errorMiddleware.js";
 
 dotenv.config();
@@ -16,6 +16,8 @@ app.use(cors());
 app.use(express.json());
 
 app.use("/api/users", userRoutes);
+app.use("/api/menu", menuRoutes);
+app.use("/api/orders", orderRoutes);
 
 
 app.get("/", (req, res) => {
