@@ -7,6 +7,9 @@ import Register from "./pages/Register";
 import Profile from "./pages/Profile";
 import PrivateRoute from "./components/PrivateRoute";
 import Menu from "./pages/Menu";
+import "./App.css";
+
+
 
 
 const Home = () => (
