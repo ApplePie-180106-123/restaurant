@@ -7,17 +7,18 @@ import Register from "./pages/Register";
 import Profile from "./pages/Profile";
 import PrivateRoute from "./components/PrivateRoute";
 import Menu from "./pages/Menu";
+import Home from "./pages/Home";
 import "./App.css";
 
 
 
 
-const Home = () => (
-  <div className="container mt-5">
-    <h2>Welcome to RMS</h2>
-    <p>Use the navbar to login or register.</p>
-  </div>
-);
+// const Home = () => (
+//   <div className="container mt-5">
+//     <h2>Welcome to RMS</h2>
+//     <p>Use the navbar to login or register.</p>
+//   </div>
+// );
 
 const App = () => {
   return (
