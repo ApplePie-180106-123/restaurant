@@ -9,18 +9,9 @@ import PrivateRoute from "./components/PrivateRoute";
 import Menu from "./pages/Menu";
 import Home from "./pages/Home";
 import AddMenuItem from "./pages/admin/AddMenuItem";
+import Cart from "./pages/Cart"
 
 import "./App.css";
-
-
-
-
-// const Home = () => (
-//   <div className="container mt-5">
-//     <h2>Welcome to RMS</h2>
-//     <p>Use the navbar to login or register.</p>
-//   </div>
-// );
 
 const App = () => {
   return (
@@ -31,7 +22,7 @@ const App = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/menu" element={<Menu />} />
-
+        <Route path="/cart" element={<Cart />} />
 
         <Route path="/profile" element={
           <PrivateRoute>

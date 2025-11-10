@@ -1,4 +1,3 @@
-// src/pages/Menu.jsx
 import React, { useEffect, useState, useContext } from "react";
 import API from "../api";
 import FilterSort from "../components/FilterSort";
@@ -8,7 +7,7 @@ import { CartContext } from "../context/CartContext";
 import { AuthContext } from "../context/AuthContext";
 
 const Menu = () => {
-    const { addItem, cart, subtotal, placeOrder, placingOrder } = useContext(CartContext);
+    const { addItem, cart, subtotal, placeOrder, placingOrder, clearCart } = useContext(CartContext);
     const { user } = useContext(AuthContext);
 
     const [items, setItems] = useState([]);
@@ -25,6 +24,18 @@ const Menu = () => {
     // modal / admin
     const [selected, setSelected] = useState(null);
     const [showDetail, setShowDetail] = useState(false);
+
+    // success popup
+    const [showPopup, setShowPopup] = useState(false);
+    const [quote, setQuote] = useState("");
+
+    const quotes = [
+        "Before you blink, your food will arrive — faster than your crush’s reply 😉",
+        "Chef just whispered: 'Serve it before he starts scrolling Instagram again!' 🍽️",
+        "Your order is racing to you like it’s on a mission from flavor heaven 🚀",
+        "Take a breath — our chefs are quicker than your thoughts 😎",
+        "Perfect! Now you can stare at your girlfriend — we’ll handle the food 😏"
+    ];
 
     useEffect(() => {
         const fetchMenu = async () => {
@@ -46,10 +57,12 @@ const Menu = () => {
 
     useEffect(() => {
         let list = [...items];
-
         if (q) {
             const qq = q.toLowerCase();
-            list = list.filter(i => (i.name || "").toLowerCase().includes(qq) || (i.description || "").toLowerCase().includes(qq));
+            list = list.filter(i =>
+                (i.name || "").toLowerCase().includes(qq) ||
+                (i.description || "").toLowerCase().includes(qq)
+            );
         }
         if (category) list = list.filter(i => i.category === category);
         if (availOnly) list = list.filter(i => i.availability);
@@ -71,23 +84,28 @@ const Menu = () => {
         if (!window.confirm("Delete this menu item?")) return;
         try {
             await API.delete(`/api/menu/${item._id}`);
-            setItems(prev => prev.filter(p => p._id !== item._1d && p._id !== item._id));
+            setItems(prev => prev.filter(p => p._id !== item._id));
         } catch (err) {
             alert(err.response?.data?.message || err.message);
         }
     };
 
-    const handleEdit = (item) => {
-        // navigate to admin menu manager or open modal - implement as you like
-        alert("Open admin menu manager to edit item (not implemented).");
-    };
-
     const handleCheckout = async () => {
+        if (!user) {
+            if (!window.confirm("You must be logged in to place an order. Go to login?")) return;
+            window.location.href = "/login";
+            return;
+        }
+
         const tableNumber = window.prompt("Table number (optional) — leave blank if not applicable");
         const tn = tableNumber ? parseInt(tableNumber, 10) : null;
+
         const res = await placeOrder({ tableNumber: tn });
         if (res.ok) {
-            alert("Order placed! Order id: " + res.data._id);
+            const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+            setQuote(randomQuote);
+            setShowPopup(true);
+            clearCart?.();
         } else {
             alert("Order failed: " + res.error);
         }
@@ -98,10 +116,15 @@ const Menu = () => {
             <h2 className="text-2xl font-semibold mb-4">Menu</h2>
 
             <FilterSort
-                q={q} onQChange={setQ}
-                categories={categories} category={category} onCategoryChange={setCategory}
-                sort={sort} onSortChange={setSort}
-                showAvailableOnly={availOnly} onAvailableToggle={setAvailOnly}
+                q={q}
+                onQChange={setQ}
+                categories={categories}
+                category={category}
+                onCategoryChange={setCategory}
+                sort={sort}
+                onSortChange={setSort}
+                showAvailableOnly={availOnly}
+                onAvailableToggle={setAvailOnly}
             />
 
             {loading ? (
@@ -118,7 +141,12 @@ const Menu = () => {
                 <>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                         {filtered.map(item => (
-                            <MenuCard key={item._id} item={item} onView={handleView} onDelete={handleDelete} onEdit={handleEdit} />
+                            <MenuCard
+                                key={item._id}
+                                item={item}
+                                onView={handleView}
+                                onDelete={handleDelete}
+                            />
                         ))}
                     </div>
 
@@ -130,8 +158,17 @@ const Menu = () => {
                                 <div className="font-semibold">Subtotal: ₹{subtotal}</div>
                             </div>
                             <div className="flex items-center gap-2">
-                                <button onClick={() => window.location.href = "/cart"} className="px-4 py-2 border rounded">View Cart</button>
-                                <button onClick={handleCheckout} disabled={cart.length === 0 || placingOrder} className="px-4 py-2 bg-rose-500 text-white rounded">
+                                <button
+                                    onClick={() => (window.location.href = "/cart")}
+                                    className="px-4 py-2 border rounded"
+                                >
+                                    View Cart
+                                </button>
+                                <button
+                                    onClick={handleCheckout}
+                                    disabled={cart.length === 0 || placingOrder}
+                                    className="px-4 py-2 bg-rose-500 text-white rounded"
+                                >
                                     {placingOrder ? "Placing..." : "Checkout"}
                                 </button>
                             </div>
@@ -140,7 +177,33 @@ const Menu = () => {
                 </>
             )}
 
-            {showDetail && <MenuDetailModal item={selected} onClose={() => { setShowDetail(false); setSelected(null); }} />}
+            {showDetail && (
+                <MenuDetailModal
+                    item={selected}
+                    onClose={() => {
+                        setShowDetail(false);
+                        setSelected(null);
+                    }}
+                />
+            )}
+
+            {/* ✅ Success Popup */}
+            {showPopup && (
+                <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
+                    <div className="bg-white rounded-2xl shadow-lg p-6 w-[90%] max-w-sm text-center animate-fade-in">
+                        <h2 className="text-2xl font-semibold text-rose-600 mb-3">
+                            Order Placed Successfully ✅
+                        </h2>
+                        <p className="text-gray-700 mb-4">{quote}</p>
+                        <button
+                            onClick={() => setShowPopup(false)}
+                            className="mt-3 px-6 py-2 bg-rose-500 text-white rounded-full hover:bg-rose-600 transition"
+                        >
+                            Okay 😋
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
