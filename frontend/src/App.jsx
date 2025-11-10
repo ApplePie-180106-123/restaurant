@@ -8,6 +8,8 @@ import Profile from "./pages/Profile";
 import PrivateRoute from "./components/PrivateRoute";
 import Menu from "./pages/Menu";
 import Home from "./pages/Home";
+import AddMenuItem from "./pages/admin/AddMenuItem";
+
 import "./App.css";
 
 
@@ -37,12 +39,11 @@ const App = () => {
           </PrivateRoute>
         } />
 
-        {/* Example: protect admin-only route */}
-        {/* <Route path="/admin" element={
+        <Route path="/admin/add-menu" element={
           <PrivateRoute roles={['admin']}>
-            <AdminPage />
+            <AddMenuItem />
           </PrivateRoute>
-        } /> */}
+        } />
       </Routes>
     </>
   );
