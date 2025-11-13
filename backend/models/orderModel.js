@@ -8,7 +8,7 @@ const orderItemSchema = new mongoose.Schema({
 const orderSchema = new mongoose.Schema({
     tableNumber: { type: Number },
     items: [orderItemSchema],
-    status: { type: String, enum: ["Pending", "Preparing", "Served", "Paid"], default: "Pending" },
+    status: { type: String, enum: ["Pending", "Preparing", "Served", "Paid", "Cancelled", "Refunded"], default: "Pending" },
     total: { type: Number, default: 0 },
     customer: { type: mongoose.Schema.Types.ObjectId, ref: "User" }, // optional for logged-in customer
     servedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" }, // waiter
