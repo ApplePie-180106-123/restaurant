@@ -46,7 +46,7 @@ const Register = () => {
                 <div className="text-center mb-6">
                     <h2 className="text-3xl font-extrabold text-gray-900">Create your account</h2>
                     <p className="mt-2 text-sm text-gray-600">
-                        Join Quantum Kitchen — register to place orders and manage your profile.
+                        Join Rockerzzz — register to place orders and manage your profile.
                     </p>
                     {location.state?.from && (
                         <p className="mt-3 text-sm text-rose-600 font-medium">
@@ -100,8 +100,10 @@ const Register = () => {
                             className="mt-1 mb-6 block w-full rounded-md border-gray-200 shadow-sm px-3 py-2 focus:ring-rose-500 focus:border-rose-500"
                         >
                             <option value="customer">Customer</option>
-                            <option value="waiter">Waiter</option>
+                            <option value="cashier">Cashier</option>
                             <option value="admin">Admin</option>
+                            <option value="waiter">Delivery Boy</option>
+                            <option value="inventory">Inventory Manager</option>
                         </select>
 
                         <button

@@ -23,7 +23,8 @@ const MenuCard = ({ item, onDelete = () => { }, onEdit = () => { }, onView = () 
         <div className="bg-white border rounded-lg shadow-sm overflow-hidden flex flex-col">
             <div className="h-40 w-full bg-gray-100 flex items-center justify-center">
                 {item.imageUrl ? (
-                    <img src={item.imageUrl} alt={item.name} className="h-full object-cover w-full" />
+                    // <img src={item.imageUrl} alt={item.name} className="h-full object-cover w-full" />
+                    <img src="/panner.jpeg" alt={item.name} className="h-full object-cover w-full" />
                 ) : (
                     <div className="text-gray-400">No image</div>
                 )}

@@ -12,10 +12,7 @@ import AddMenuItem from "./pages/admin/AddMenuItem";
 import Cart from "./pages/Cart"
 import Orders from "./pages/admin/Orders";
 import InventoryManager from "./pages/admin/InventoryManager";
-
-
 import "./App.css";
-
 const App = () => {
   return (
     <>
@@ -41,7 +38,7 @@ const App = () => {
         <Route
           path="/admin/orders"
           element={
-            <PrivateRoute roles={["admin", "waiter"]}>
+            <PrivateRoute roles={["admin", "waiter", "cashier"]}>
               <Orders />
             </PrivateRoute>
           }

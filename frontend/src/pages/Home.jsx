@@ -43,7 +43,7 @@ const Home = () => {
                 <div className="container mx-auto px-6 py-4 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         <Link to="/" className="text-xl font-bold text-gray-900">
-                            Quantum <span className="text-rose-600">Kitchen</span>
+                            Rockerzzz<span className="text-rose-600">Kitchen</span>
                         </Link>
                         <span className="text-sm text-gray-500">• Fresh • Fast • Futuristic</span>
                     </div>

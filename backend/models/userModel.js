@@ -5,7 +5,7 @@ const userSchema = new mongoose.Schema({
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    role: { type: String, enum: ["admin", "waiter", "customer"], default: "customer" },
+    role: { type: String, enum: ["admin", "inventory", "customer", "waiter", "cashier"], default: "customer" },
 }, { timestamps: true });
 
 // hash password before save
