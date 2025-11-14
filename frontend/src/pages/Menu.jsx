@@ -9,6 +9,7 @@ import { AuthContext } from "../context/AuthContext";
 const Menu = () => {
     const { addItem, cart, subtotal, placeOrder, placingOrder, clearCart } = useContext(CartContext);
     const { user } = useContext(AuthContext);
+    const isAdmin = user?.role === "admin"; // Check admin role once
 
     const [items, setItems] = useState([]);
     const [filtered, setFiltered] = useState([]);
@@ -24,6 +25,7 @@ const Menu = () => {
     // modal / admin
     const [selected, setSelected] = useState(null);
     const [showDetail, setShowDetail] = useState(false);
+    const [isEditing, setIsEditing] = useState(false); // NEW STATE for edit mode
 
     // success popup
     const [showPopup, setShowPopup] = useState(false);
@@ -75,12 +77,34 @@ const Menu = () => {
         setFiltered(list);
     }, [items, q, category, sort, availOnly]);
 
+    // Handle viewing details (default mode)
     const handleView = (item) => {
         setSelected(item);
+        setIsEditing(false); // Ensure edit mode is false
         setShowDetail(true);
     };
 
+    // NEW: Handle editing (Admin mode)
+    const handleEdit = (item) => {
+        if (!isAdmin) return; // Guard for non-admin clicks
+        setSelected(item);
+        setIsEditing(true); // Set edit mode to true
+        setShowDetail(true);
+    };
+
+    // NEW: Function to update item in state after successful edit (to be passed to MenuDetailModal)
+    const handleUpdateItem = (updatedItem) => {
+        setItems(prev => prev.map(item => (item._id === updatedItem._id ? updatedItem : item)));
+        setShowDetail(false); // Close modal
+        setSelected(null);
+        setIsEditing(false);
+    }
+
     const handleDelete = async (item) => {
+        if (!isAdmin) {
+            alert("Only admins can delete menu items.");
+            return;
+        }
         if (!window.confirm("Delete this menu item?")) return;
         try {
             await API.delete(`/api/menu/${item._id}`);
@@ -146,6 +170,9 @@ const Menu = () => {
                                 item={item}
                                 onView={handleView}
                                 onDelete={handleDelete}
+                                // Pass handleEdit to MenuCard (assuming MenuCard uses it if isAdmin is true)
+                                onEdit={handleEdit}
+                                isAdmin={isAdmin}
                             />
                         ))}
                     </div>
@@ -177,12 +204,16 @@ const Menu = () => {
                 </>
             )}
 
+            {/* MenuDetailModal now receives the isEditing flag and the update handler */}
             {showDetail && (
                 <MenuDetailModal
                     item={selected}
+                    isEditing={isEditing} // NEW PROP
+                    onUpdateItem={handleUpdateItem} // NEW PROP
                     onClose={() => {
                         setShowDetail(false);
                         setSelected(null);
+                        setIsEditing(false); // Reset editing state on close
                     }}
                 />
             )}
