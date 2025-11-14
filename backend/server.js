@@ -6,6 +6,7 @@ import userRoutes from "./routes/userRoutes.js";
 import menuRoutes from "./routes/menuRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import { notFound, errorHandler } from "./middleware/errorMiddleware.js";
+import inventoryRoutes from './routes/inventoryRoutes.js';
 
 dotenv.config();
 connectDB();
@@ -18,7 +19,7 @@ app.use(express.json());
 app.use("/api/users", userRoutes);
 app.use("/api/menu", menuRoutes);
 app.use("/api/orders", orderRoutes);
-
+app.use('/api/inventory', inventoryRoutes);
 
 app.get("/", (req, res) => {
     res.send("API is running...");
