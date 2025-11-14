@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef, useContext, useMemo } from "react";
+import { useNavigate } from "react-router-dom"; // 1. Import useNavigate
 import API from "../../api";
 import dayjs from "dayjs";
 import { AuthContext } from "../../context/AuthContext";
@@ -7,6 +8,7 @@ import { AuthContext } from "../../context/AuthContext";
 const BillModal = ({ order, onClose }) => {
     if (!order) return null;
 
+    // ... (BillModal content remains the same)
     const subtotal = order.total / (1 + (order.taxRate || 0) / 100);
     const taxAmount = order.total - subtotal;
 
@@ -95,13 +97,14 @@ const BillModal = ({ order, onClose }) => {
 
 export default function Orders() {
     const { user } = useContext(AuthContext);
+    const navigate = useNavigate(); // 2. Initialize useNavigate
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [updating, setUpdating] = useState(false);
     const [lastUpdated, setLastUpdated] = useState(null);
     const [highlighted, setHighlighted] = useState([]);
-    const [selectedOrderForBill, setSelectedOrderForBill] = useState(null); // NEW STATE for bill
+    const [selectedOrderForBill, setSelectedOrderForBill] = useState(null);
     const intervalRef = useRef(null);
 
     // 1. UPDATED STATUSES: Add delivery-related options
@@ -113,7 +116,7 @@ export default function Orders() {
     // Statuses a delivery person deals with (for the dropdown)
     const deliveryStatusesForDropdown = ["Preparing", "Out for delivery", "Delivered"];
 
-    // --- Role Definitions (UPDATED for clarity) ---
+    // --- Role Definitions ---
     const userRole = user?.role;
     const isCashier = userRole === 'cashier';
     const isAdmin = userRole === 'admin';
@@ -201,13 +204,11 @@ export default function Orders() {
         }
     };
 
-    // MODIFIED: This now opens the bill modal instead of a new route
     const handlePrint = (orderId) => {
         const orderToDisplay = orders.find(o => o._id === orderId);
         if (orderToDisplay) {
             setSelectedOrderForBill(orderToDisplay);
         }
-        // Original logic: window.open(`/orders/${orderId}/invoice`, "_blank");
     };
 
     const getStatusBadge = (status) => {
@@ -218,8 +219,8 @@ export default function Orders() {
             Paid: "bg-gray-100 text-gray-700",
             Cancelled: "bg-red-100 text-red-700",
             Refunded: "bg-purple-100 text-purple-700",
-            'Out for delivery': "bg-indigo-100 text-indigo-700", // Delivery status
-            Delivered: "bg-emerald-100 text-emerald-700",       // Delivery status
+            'Out for delivery': "bg-indigo-100 text-indigo-700",
+            Delivered: "bg-emerald-100 text-emerald-700",
         };
         const cls = colors[status] || "bg-gray-100 text-gray-700";
         return (
@@ -268,6 +269,16 @@ export default function Orders() {
 
     return (
         <div className="max-w-7xl mx-auto p-6">
+            {/* NEW: Home Navigation Button */}
+            <div className="mb-4">
+                <button
+                    onClick={() => navigate('/')}
+                    className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition duration-150 ease-in-out flex items-center"
+                >
+                    🏠 Home
+                </button>
+            </div>
+
             <div className="flex justify-between items-center mb-6">
                 <h2 className="text-2xl font-bold text-gray-800">Order Management ({userRole ? userRole.toUpperCase() : 'STAFF'} View)</h2>
                 <div className="flex items-center gap-3 text-sm text-gray-500">
@@ -384,7 +395,7 @@ export default function Orders() {
                 </div>
             )}
 
-            {/* NEW: Bill Modal Rendering */}
+            {/* Bill Modal Rendering */}
             {selectedOrderForBill && (
                 <BillModal
                     order={selectedOrderForBill}

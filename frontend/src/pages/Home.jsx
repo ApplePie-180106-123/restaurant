@@ -13,6 +13,7 @@ const Home = () => {
     const navigate = useNavigate();
     const { user, logout } = useContext(AuthContext); // AuthContext must provide user and logout
 
+    const allowedOrderRoles = ["admin", "waiter", "cashier"];
     const goToMenu = () => {
         if (user) {
             navigate("/menu");
@@ -33,6 +34,23 @@ const Home = () => {
             // You can replace with a toast. For now we redirect to home
             alert("You need admin privileges to access this page.");
             navigate("/", { replace: true });
+        }
+    };
+    const goToOrders = () => {
+        const orderPath = "/admin/orders";
+
+        if (user) {
+            // Check if the logged-in user has the required role
+            if (allowedOrderRoles.includes(user.role)) {
+                navigate(orderPath);
+            } else {
+                // Logged in but unauthorized role
+                alert("You are not authorized to view orders.");
+                navigate("/", { replace: true });
+            }
+        } else {
+            // Guest -> login first, then return to orders page
+            navigate("/login", { state: { from: orderPath } });
         }
     };
 
@@ -122,6 +140,12 @@ const Home = () => {
                                     Admin Only
                                 </button>
                             )}
+                            <button
+                                onClick={goToOrders}
+                                className="px-6 py-3 bg-white border border-gray-200 text-gray-700 rounded-full shadow hover:bg-gray-50 transition"
+                            >
+                                Ordres
+                            </button>
                         </div>
                     </div>
 
