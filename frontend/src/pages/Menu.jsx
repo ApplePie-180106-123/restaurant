@@ -1,14 +1,17 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState, useContext, useMemo } from "react";
 import API from "../api";
 import FilterSort from "../components/FilterSort";
 import MenuCard from "../components/MenuCard";
 import MenuDetailModal from "../components/MenuDetailModal";
 import { CartContext } from "../context/CartContext";
 import { AuthContext } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom"; // Added useNavigate for better routing
 
 const Menu = () => {
     const { addItem, cart, subtotal, placeOrder, placingOrder, clearCart } = useContext(CartContext);
     const { user } = useContext(AuthContext);
+    const isAdmin = user?.role === "admin"; // Identify admin role
+    const navigate = useNavigate();
 
     const [items, setItems] = useState([]);
     const [filtered, setFiltered] = useState([]);
@@ -24,6 +27,7 @@ const Menu = () => {
     // modal / admin
     const [selected, setSelected] = useState(null);
     const [showDetail, setShowDetail] = useState(false);
+    const [isEditing, setIsEditing] = useState(false); // NEW STATE for edit mode
 
     // success popup
     const [showPopup, setShowPopup] = useState(false);
@@ -52,8 +56,10 @@ const Menu = () => {
         fetchMenu();
     }, []);
 
-    // derive categories
-    const categories = Array.from(new Set(items.map(i => i.category).filter(Boolean)));
+    // derive categories (using useMemo for efficiency)
+    const categories = useMemo(() => {
+        return Array.from(new Set(items.map(i => i.category).filter(Boolean)));
+    }, [items]);
 
     useEffect(() => {
         let list = [...items];
@@ -77,11 +83,34 @@ const Menu = () => {
 
     const handleView = (item) => {
         setSelected(item);
+        setIsEditing(false); // Ensure view mode is active
         setShowDetail(true);
     };
 
+    // NEW: Handler for editing (Admin only)
+    const handleEdit = (item) => {
+        if (!isAdmin) return; // Safety guard
+        setSelected(item);
+        setIsEditing(true); // Set edit mode to true
+        setShowDetail(true);
+    };
+
+    // NEW: Function to update item in state after successful edit
+    const handleUpdateItem = (updatedItem) => {
+        setItems(prev => prev.map(item => (item._id === updatedItem._id ? updatedItem : item)));
+        setShowDetail(false); // Close modal
+        setSelected(null);
+        setIsEditing(false);
+    }
+
     const handleDelete = async (item) => {
-        if (!window.confirm("Delete this menu item?")) return;
+        if (!isAdmin) { // Restrict delete to admin
+            alert("You must be an admin to delete menu items.");
+            return;
+        }
+
+        if (!window.confirm(`Are you sure you want to delete "${item.name}"?`)) return;
+
         try {
             await API.delete(`/api/menu/${item._id}`);
             setItems(prev => prev.filter(p => p._id !== item._id));
@@ -93,7 +122,7 @@ const Menu = () => {
     const handleCheckout = async () => {
         if (!user) {
             if (!window.confirm("You must be logged in to place an order. Go to login?")) return;
-            window.location.href = "/login";
+            navigate("/login", { state: { from: "/menu" } }); // Use navigate for better routing
             return;
         }
 
@@ -146,6 +175,8 @@ const Menu = () => {
                                 item={item}
                                 onView={handleView}
                                 onDelete={handleDelete}
+                                onEdit={handleEdit} // NEW PROP
+                                isAdmin={isAdmin}   // NEW PROP
                             />
                         ))}
                     </div>
@@ -159,7 +190,7 @@ const Menu = () => {
                             </div>
                             <div className="flex items-center gap-2">
                                 <button
-                                    onClick={() => (window.location.href = "/cart")}
+                                    onClick={() => navigate("/cart")} // Use navigate
                                     className="px-4 py-2 border rounded"
                                 >
                                     View Cart
@@ -180,9 +211,12 @@ const Menu = () => {
             {showDetail && (
                 <MenuDetailModal
                     item={selected}
+                    isEditing={isEditing}      // NEW PROP
+                    onUpdateItem={handleUpdateItem} // NEW PROP
                     onClose={() => {
                         setShowDetail(false);
                         setSelected(null);
+                        setIsEditing(false); // Reset edit state on close
                     }}
                 />
             )}
