@@ -10,6 +10,9 @@ import Menu from "./pages/Menu";
 import Home from "./pages/Home";
 import AddMenuItem from "./pages/admin/AddMenuItem";
 import Cart from "./pages/Cart"
+import Orders from "./pages/admin/Orders";
+import InventoryManager from "./pages/admin/InventoryManager";
+
 
 import "./App.css";
 
@@ -35,6 +38,22 @@ const App = () => {
             <AddMenuItem />
           </PrivateRoute>
         } />
+        <Route
+          path="/admin/orders"
+          element={
+            <PrivateRoute roles={["admin", "waiter"]}>
+              <Orders />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/admin/inventory"
+          element={
+            <PrivateRoute roles={['inventory', 'admin']}>
+              <InventoryManager />
+            </PrivateRoute>
+          }
+        />
       </Routes>
     </>
   );
