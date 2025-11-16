@@ -29,13 +29,21 @@ export const updateMenuItem = asyncHandler(async (req, res) => {
     const updated = await menu.save();
     res.json(updated);
 });
-
 // @desc    Delete menu item
 // @route   DELETE /api/menu/:id
 // @access  Admin
 export const deleteMenuItem = asyncHandler(async (req, res) => {
     const menu = await MenuItem.findById(req.params.id);
-    if (!menu) { res.status(404); throw new Error("Menu item not found"); }
-    await menu.remove();
+
+    if (!menu) {
+        res.status(404);
+        throw new Error("Menu item not found");
+    }
+
+    // Fix: Use deleteOne() instead of the deprecated remove()
+    await menu.deleteOne();
+
+    // Alternatively, you could use: await MenuItem.deleteOne({ _id: req.params.id });
+
     res.json({ message: "Menu item removed" });
 });
