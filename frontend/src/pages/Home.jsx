@@ -13,7 +13,7 @@ const Home = () => {
     const navigate = useNavigate();
     const { user, logout } = useContext(AuthContext); // AuthContext must provide user and logout
 
-    const allowedOrderRoles = ["admin", "waiter", "cashier"];
+    const allowedOrderRoles = ["admin", "waiter", "cashier", "delivery"];
     const goToMenu = () => {
         if (user) {
             navigate("/menu");
@@ -51,6 +51,20 @@ const Home = () => {
         } else {
             // Guest -> login first, then return to orders page
             navigate("/login", { state: { from: orderPath } });
+        }
+    };
+    const goToInventory = () => {
+        // Only admin should reach /admin/add-menu
+        if (user && (user.role === "admin" || user.role === "inventory")) {
+            navigate("/admin/inventory");
+        } else if (!user) {
+            // guest -> login first, then return to admin add page
+            navigate("/login", { state: { from: "/admin/inventory" } });
+        } else {
+            // logged in but not admin: show message or redirect
+            // You can replace with a toast. For now we redirect to home
+            alert("You need admin privileges to access this page.");
+            navigate("/", { replace: true });
         }
     };
 
@@ -105,7 +119,7 @@ const Home = () => {
                 <header className="container mx-auto px-6 py-16 flex flex-col lg:flex-row items-center justify-between gap-10">
                     <div className="flex-1 text-center lg:text-left">
                         <h1 className="text-5xl font-bold mb-4 text-gray-900">
-                            Welcome to <span className="text-rose-600">Quantum Kitchen</span>
+                            Welcome to <span className="text-rose-600">Rockerzz</span>
                         </h1>
                         <p className="text-lg text-gray-600 max-w-lg mx-auto lg:mx-0">
                             Where innovation meets flavor. Step into the future of dining — crafted with taste, precision, and technology.
@@ -145,6 +159,12 @@ const Home = () => {
                                 className="px-6 py-3 bg-white border border-gray-200 text-gray-700 rounded-full shadow hover:bg-gray-50 transition"
                             >
                                 Ordres
+                            </button>
+                            <button
+                                onClick={goToInventory}
+                                className="px-6 py-3 bg-white border border-gray-200 text-gray-700 rounded-full shadow hover:bg-gray-50 transition"
+                            >
+                                Inventory
                             </button>
                         </div>
                     </div>

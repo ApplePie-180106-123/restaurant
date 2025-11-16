@@ -198,7 +198,7 @@ export default function Orders() {
             const res = await API.put(`/api/orders/${orderId}/cancel`);
             const updated = res.data || null;
             setOrders((prev) => prev.map((o) => (o._id === orderId ? (updated || { ...o, status: "Cancelled" }) : o)));
-            alert("Order cancelled.");
+            alert("Order cancelled.Money refunded to customer");
         } catch (err) {
             alert(err.response?.data?.message || "Cancel failed");
         }

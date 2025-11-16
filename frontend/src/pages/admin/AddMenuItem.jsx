@@ -101,7 +101,7 @@ export default function AddMenuItem() {
             setFile(null);
 
             // optional: navigate back to admin list or to the newly created item
-            setTimeout(() => navigate("/admin/menu"), 800);
+            setTimeout(() => navigate("/menu"), 800);
 
         } catch (err) {
             setError(err.response?.data?.message || err.message || "Failed to create menu item");
